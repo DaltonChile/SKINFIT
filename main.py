@@ -59,6 +59,12 @@ umbral_frecuencia = 0.005
 try:
     df = pd.read_csv(archivo_entrada)
     print(f"Archivo original '{archivo_entrada}' cargado. Dimensiones: {df.shape}")
+    
+    # Convertir fecha al formato estándar ISO (YYYY-MM-DD) para compatibilidad con Google Looker
+    if 'fecha' in df.columns:
+        df['fecha'] = pd.to_datetime(df['fecha'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
+        print(f"Columna 'fecha' convertida al formato ISO (YYYY-MM-DD)")
+        
 except FileNotFoundError:
     print(f"Error: No se pudo encontrar el archivo '{archivo_entrada}'.")
     exit()
