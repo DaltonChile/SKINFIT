@@ -42,8 +42,8 @@ def consolidar_atributos(series, umbral_similitud=85):
 # --- SCRIPT PRINCIPAL "TODO EN UNO" ---
 
 # 1. Configuración
-archivo_entrada = 'Base2 - Sesiones.csv'  # <-- El archivo ORIGINAL
-archivo_salida = 'datos_finales_transformados_y_reducidos.csv'
+archivo_entrada = 'Base - Sesiones.csv'  # <-- El archivo ORIGINAL
+archivo_salida = 'SesionesFinal.csv'
 
 columnas_a_procesar = [
     'tipo_tratamiento',
@@ -64,6 +64,21 @@ try:
     if 'fecha' in df.columns:
         df['fecha'] = pd.to_datetime(df['fecha'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
         print(f"Columna 'fecha' convertida al formato ISO (YYYY-MM-DD)")
+    
+    # Crear columna ID: usar mail si existe, sino nombre_apellido
+    def crear_id(row):
+        if pd.notna(row.get('mail')) and str(row.get('mail')).strip() != '':
+            return str(row['mail']).strip().lower()
+        else:
+            nombre = str(row.get('nombre', '')).strip()
+            apellido = str(row.get('apellido', '')).strip()
+            if nombre or apellido:
+                return f"{nombre}_{apellido}".lower().replace(' ', '_')
+            else:
+                return f"sin_id_{row.name}"  # Fallback: usar índice de fila
+    
+    df['ID'] = df.apply(crear_id, axis=1)
+    print(f"Columna 'ID' creada. IDs con mail: {df['ID'].str.contains('@').sum()}, IDs con nombre_apellido: {(~df['ID'].str.contains('@') & ~df['ID'].str.contains('sin_id')).sum()}")
         
 except FileNotFoundError:
     print(f"Error: No se pudo encontrar el archivo '{archivo_entrada}'.")
