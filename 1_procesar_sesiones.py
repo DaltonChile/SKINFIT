@@ -52,6 +52,13 @@ columnas_a_procesar = [
     'productos',
 ]
 
+# Columnas simples a binarizar (sin consolidación fuzzy)
+columnas_simples = [
+    'membresia',
+    'tipo_piel',
+    'tolerancia'
+]
+
 # Umbral de relevancia (0.005 = 0.5%)
 umbral_frecuencia = 0.005
 
@@ -122,10 +129,33 @@ for columna in columnas_a_procesar:
                 total_columnas_descartadas += 1
                 # print(f"    -> Se DESCARTA '{nueva_columna_nombre}' (Aparece solo {nueva_serie.sum()} veces)")
 
+# 3.5. Procesar columnas simples (sin consolidación, one-hot encoding directo)
+print(f"\n--- PROCESANDO COLUMNAS SIMPLES ---")
+for columna in columnas_simples:
+    if columna in df.columns:
+        print(f"\n  - Procesando columna simple: '{columna}'")
+        # Obtener valores únicos (no nulos)
+        valores_unicos = df[columna].dropna().unique()
+        
+        for valor in valores_unicos:
+            total_columnas_generadas += 1
+            nueva_columna_nombre = f"{columna}_{str(valor).replace(' ', '_').lower()}"
+            
+            # Crear columna binaria
+            nueva_serie = (df[columna] == valor).astype(int)
+            nueva_serie.name = nueva_columna_nombre
+            
+            # Filtrar por frecuencia
+            if nueva_serie.sum() >= min_apariciones:
+                columnas_nuevas_relevantes.append(nueva_serie)
+            else:
+                total_columnas_descartadas += 1
+
 
 # 4. Ensamblaje Final
 # Tomamos el DataFrame original y eliminamos las columnas que procesamos
-df_base = df.drop(columns=[col for col in columnas_a_procesar if col in df.columns])
+columnas_a_eliminar = [col for col in columnas_a_procesar + columnas_simples if col in df.columns]
+df_base = df.drop(columns=columnas_a_eliminar)
 
 # Unimos el DataFrame base con la lista de nuevas columnas que sí pasaron el filtro
 df_final = pd.concat([df_base] + columnas_nuevas_relevantes, axis=1)

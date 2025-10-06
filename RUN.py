@@ -1,11 +1,12 @@
 """
-SCRIPT MAESTRO - SKINFIT
-========================
-Ejecuta todo el pipeline de procesamiento en orden correcto:
-1. Procesa sesiones (main.py)
-2. Procesa clientes (procesar_clientes.py)
-3. Verifica compatibilidad (verificar_join.py)
-4. Hace el JOIN (hacer_join.py)
+🚀 SKINFIT - EJECUTAR TODO
+===========================
+Este script ejecuta todo el pipeline automáticamente.
+
+Simplemente ejecuta: python RUN.py
+
+El proceso completo genera el archivo DatosCompletos.csv
+listo para usar en Google Looker Studio.
 """
 
 import subprocess
@@ -34,10 +35,9 @@ print("🚀 INICIANDO PIPELINE COMPLETO - SKINFIT")
 print("="*70)
 
 pasos = [
-    ("main.py", "PASO 1: Procesando sesiones (consolidación + transformación)"),
-    ("procesar_clientes.py", "PASO 2: Procesando clientes (creación de ID)"),
-    ("verificar_join.py", "PASO 3: Verificando compatibilidad de IDs"),
-    ("hacer_join.py", "PASO 4: Haciendo JOIN de sesiones y clientes")
+    ("1_procesar_sesiones.py", "PASO 1: Procesando sesiones (consolidación + binarización)"),
+    ("2_procesar_clientes.py", "PASO 2: Procesando clientes (creación de ID)"),
+    ("3_hacer_join.py", "PASO 3: Haciendo JOIN (sesiones + clientes)")
 ]
 
 for i, (script, descripcion) in enumerate(pasos, 1):
@@ -49,9 +49,11 @@ for i, (script, descripcion) in enumerate(pasos, 1):
 print("\n" + "="*70)
 print("🎉 PIPELINE COMPLETADO EXITOSAMENTE")
 print("="*70)
-print("\nArchivos generados:")
-print("  📄 SesionesFinal.csv - Sesiones procesadas y consolidadas")
-print("  📄 ClientesFinal.csv - Clientes con columna ID")
-print("  📄 DatosCompletos.csv - JOIN completo (sesiones + clientes)")
-print("\n✨ ¡Todo listo para usar en Google Looker Studio!")
+print("\n📁 Archivo generado:")
+print("  ✅ DatosCompletos.csv - Archivo final para Google Looker")
+print("\n� Contiene:")
+print("  • Todas las sesiones con datos procesados")
+print("  • Todos los clientes (con y sin sesiones)")
+print("  • Columnas binarizadas listas para análisis")
+print("\n✨ ¡Listo para usar en Google Looker Studio!")
 print("="*70)
